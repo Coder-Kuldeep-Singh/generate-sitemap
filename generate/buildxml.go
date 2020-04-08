@@ -4,12 +4,20 @@ import (
 	"fmt"
 	"generate-sitemap/model"
 	"regexp"
+	"strings"
+	"time"
 )
+
+func Today() string {
+	a := strings.Split(time.Now().UTC().Format(time.RFC3339), "T")
+	return a[0]
+}
 
 func GenerateXml() string {
 	list := model.GetJob()
-	Header := `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n"
-	rowS := `<sitemap>`
+	Header := `<?xml version="1.0" encoding="utf-8"?>
+	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">` + "\n"
+	rowS := `<jobs>`
 	for _, li := range list {
 
 		str := fmt.Sprintf("%#v", li)
@@ -26,15 +34,25 @@ func GenerateXml() string {
 			// 	return ""
 			// }
 			// urlslice += string(e) + "\n"
-			rowS += `<jobs>` +
-				`<job>` + url[1] + `</job>` +
-				`</jobs>`
-
+			// rowS += `<job>` +
+			// 	`<url>` + url[1] + `</url>` +
+			// 	`<lastmod>` + Today() + "</lastmod>" +
+			// 	`<changefreq>daily</changefreq>` +
+			// 	`<priority>0.6</priority>` +
+			// 	`</job>`
+			rowS += fmt.Sprintf(`
+				<job>
+					<url> %s </url>
+					<lastmod> %s </lastmod>
+					<changefreq>daily</changefreq>
+					<priority>0.6</priority>
+				</job>
+				`, url[1], Today())
 		}
 
 	}
 
-	rowS += `</sitemap>`
+	rowS += `</jobs>`
 	rowS += "\n"
 	Closing := `</urlset>`
 
